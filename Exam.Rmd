@@ -1,0 +1,136 @@
+---
+title: "Exam_2017"
+author: "Jacintha Johnson"
+date: "8/3/2017"
+output: html_document
+---
+
+#Question 1
+```{r Question1, echo=TRUE}
+#Import libraries to tidy and manipulate the data
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+#import the data file
+pain1 <- read.csv("https://dl.dropboxusercontent.com/u/11805474/painblogr/biostats/exam-data-2017/question_1.csv")
+
+#1a) Group and location (which are two separate variables) are stored in one column. Pain intensity readings are in three separate columns, these can be stacked into one column.
+
+#tidy and manipulate the data
+pain1 %>%
+  separate(Group.and.location, c("group", "location"), sep= "_", remove=TRUE)%>%
+ select(location, Baseline:Week.8)%>%
+gather(pain1, pain, Baseline:Week.8) -> tidied
+tidied
+
+ggplot(tidied, aes(x=pain1, y=pain)) + geom_point(shape=1) + geom_smooth(method=lm, se=FALSE) + ylab(label="Pain Intensity") + xlab("Time") + ggtitle("Relationsip between pain intensity over 3 time intervals at each location")
+
+
+```
+
+#Question 2
+##Hypothesis
+####Ho:There is no relationship between religion and fertility in Swiss states
+####HA: Fertility does depend on religion in Swiss states
+####Data is quantitative and continuous so the statistical test to use will be a multiple linear regression model. 
+##Assumptions
+####There is a linear relationship between the outcome variable and the independent variables. 
+####It assumes the variables are normally distributed. 
+####It assumes the independetn variables are not highlighy correlated with each otehr. 
+####It assumes homoscedasticity
+```{r Question2, echo=TRUE}
+#Import libraries to tidy and manipulate the data
+library(dplyr)
+library(tidyr)
+
+#import the data file
+religion <- read.csv("https://dl.dropboxusercontent.com/u/11805474/painblogr/biostats/exam-data-2017/question_2.csv")
+
+#get a summary of key values
+summary(religion)
+
+#use a scatterplot to plot the data as we will use a multiple linear regression model
+plot(x= religion$State, y= religion$Fertility, ylab="Fertility", main= "Relationship betweeen religion and fertility in the late 19th century French-speaking Swiss states", xlab="States")
+
+#use a linear regression model as the statistical test
+Q2test <- lm(Fertility~Catholic, data = religion)
+
+#get the outcomes of the test
+summary(Q2test)
+
+#df= 45, p-value= 0.001029
+#The p-value is less than 0.05, therefore we reject the null hypothesis
+#One can conclude there is a relationship between religion and fertility in these 19th century Swiss states
+```
+
+#Question 3
+##Hypothesis
+####Ho: There is no difference in crop yield between the 3 groups
+####HA: There is a difference in the crop yields between the 3 groups
+
+####This data is quantitative and continuos
+####So one will use an two-way ANOVA test 
+##Assumptions
+####An ANOVA assumes independence of cases, normality, homoscedasticity, groups have same sample size, variances of populaations are equal. 
+```{r Question3, echo=TRUE}
+
+#Import libraries to tidy and manipulate the data
+library(dplyr)
+library(tidyr)
+
+#import the data file
+treatment <- read.csv("https://dl.dropboxusercontent.com/u/11805474/painblogr/biostats/exam-data-2017/question_3.csv")
+
+
+#get a summary of key values
+summary(treatment)
+
+#Plot the data using a boxplot
+boxplot(treatment, main="Relationship between condition and crop yield.", xlab="Condition", ylab="Crop Yield")
+
+#perform statistical test (ANOVA)
+test <- aov(control~treatment_1*treatment_2, data=treatment)
+test
+summary(test)
+
+#treatment_1: p-value: 0.1024 , df = 1
+#Treatment_2: p-value: 0.0648 , df = 1
+#interaction: p-value: 0.1391 , df = 1
+#p-values are greater than 0.05 therefore we accept the null hypothesis. #one can conclude there is no difference in the crop yield between the 3 conditions
+
+```
+
+#Question 4
+##Hypothesis
+####Ho: The variables are independent
+####HA: The variables are dependent
+####This data is categorical with 2 or more categories so one will use a chi-square test (Fishers to get an exact p-value)
+##Assumptions
+####the samples have been drawn randomly and a directional hypothesis is assumed
+```{r Question4, echo=TRUE}
+
+#Import libraries to tidy and manipulate the data
+library(dplyr)
+library(tidyr)
+
+#import the data file
+heartattack <- read.csv("https://dl.dropboxusercontent.com/u/11805474/painblogr/biostats/exam-data-2017/question_4.csv")
+
+#get a summary of key values
+summary(heartattack)
+
+#contingency table of the data
+contab <- table(heartattack$Diet, heartattack$Condition)
+contab
+
+#Perform Statistical test
+fishtest <- fisher.test(contab)
+fishtest
+
+#p-value = 0.0004174
+#alternative hypothesis: two.sided
+#The p-value is less than 0.05 therefore one rejects the null hypothesis
+#one can conclude the variables are dependent
+#the Mediterranean diet is superior to the AHA diet
+```
